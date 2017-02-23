@@ -126,7 +126,7 @@ export interface Account extends DocRef {
    * or a `_deleted: true` or an `unrestricted: true` entry.
    */
   set (props: Partial<AccountObject>, passphrase?: string): Promise<Account>
-  emit <T>(): T
+  emit <T>(...args: any[]): T
 }
 
 export interface AccountDoc extends AccountObject, DocRef {}
