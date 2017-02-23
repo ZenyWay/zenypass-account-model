@@ -18,7 +18,8 @@ import { __assign as assign } from 'tslib'
 const parseURL = require('url').parse
 
 export interface AccountFactoryBuilder {
-  (authorize: Authorize, onEmit: <T>(doc: AccountDoc) => T,
+  (authorize: Authorize,
+  onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
   opts?: Partial<AccountFactorySpec>): AccountFactory
 }
 
@@ -159,7 +160,8 @@ const IS_VALID_ACCOUNT_OBJECT_ENTRY: { [P in keyof AccountObject]: Predicate } =
 }
 
 const getAccountFactory: AccountFactoryBuilder =
-function (authorize: Authorize, onEmit: <T>(doc: AccountDoc) => T,
+function (authorize: Authorize,
+onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
 opts?: Partial<AccountFactorySpec>) {
   return function (obj?: any) {
     return _AccountBuilder.getInstance(authorize, onEmit, opts)
@@ -171,7 +173,8 @@ opts?: Partial<AccountFactorySpec>) {
 }
 
 class _AccountBuilder {
-  static getInstance (authorize: Authorize, onEmit: <T>(doc: AccountDoc) => T,
+  static getInstance (authorize: Authorize,
+  onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
   opts?: Partial<AccountFactorySpec>): _AccountBuilder {
     const withDocRef = opts && opts.include_docref
     const authHandler = isFunction(authorize) ? authorize : freepass
@@ -226,6 +229,7 @@ class _AccountBuilder {
   toAccount (): Account {
     const builder = this
     const account = this.account
+    const onEmit = builder.onEmit // unbind from builder to prevent leak
     return {
       get _id () { return account._id },
       get _deleted () { return account._deleted },
@@ -250,14 +254,16 @@ class _AccountBuilder {
         ? this // authorize may optionally reject with an Error, in which case this never executes
         : update.withDefaultNameAndId().toAccount())
       },
-      emit <T>() { return builder.onEmit<T>(account) }
+      emit <T>() {
+        return onEmit<T>(account, this)
+      }
     }
   }
 
   private constructor (
     readonly includeDocRef: boolean,
     readonly authorize: Authorize,
-    readonly onEmit: <T>(doc: Partial<AccountDoc>) => T,
+    readonly onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
     readonly getDocId: (obj: Partial<AccountObject>) => string,
     readonly getName: (obj: Partial<AccountObject>) => string|void,
     readonly account: Partial<AccountDoc> = {}

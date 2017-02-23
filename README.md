@@ -39,11 +39,11 @@ supplied when calling the `Account.password` or `Account.set` methods.
 the `authorize` method should return a `Promise` that resolves
 to `true` when access is authorized,
 `false` or alternatively reject with a corresponding Error otherwise.
-* finally, the `onEmit` method indirectly provides unrestricted access
+* finally, the `onEmit` method provides indirect but unrestricted access
 for the controlling party to private properties of an `Account` instance.
 when calling `Account.emit`, the controlling party's `onEmit` method
-is called with a plain object clone of the `Account` instance,
-including its private entries.
+is called with both a plain object clone of the `Account` instance,
+including its private entries, and the `Account` instance itself.
 if the controlling party's `onEmit` method returns a value,
 `Account.emit` returns that value as well.
 
@@ -120,7 +120,7 @@ unrestricted
 ```
 the files of this example are available [in this repository](./spec/example).
 
-view a [live version of this example in your browser console](https://cdn.rawgit.com/ZenyWay/zenypass-account-model/v1.0.0/spec/example/index.html),
+view a [live version of this example in your browser console](https://cdn.rawgit.com/ZenyWay/zenypass-account-model/v1.1.0/spec/example/index.html),
 or clone this repository and run the following commands from a terminal:
 ```bash
 npm install
@@ -132,7 +132,7 @@ npm run example
 coded in `Typescript 2`, transpiled to `ES5`.
 
 for a detailed specification of the API,
-[run the unit tests in your browser](https://cdn.rawgit.com/ZenyWay/zenypass-account-model/v1.0.0/spec/web/index.html).
+[run the unit tests in your browser](https://cdn.rawgit.com/ZenyWay/zenypass-account-model/v1.1.0/spec/web/index.html).
 
 # <a name="contributing"></a> CONTRIBUTING
 see the [contribution guidelines](./CONTRIBUTING.md)
