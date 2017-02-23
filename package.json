@@ -1,6 +1,6 @@
 {
   "name": "zenypass-account-model",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "immutable model with access-control for ZenyPass records of user bookmarks and corresponding identifiers.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

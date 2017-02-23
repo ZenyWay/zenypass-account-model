@@ -19,7 +19,7 @@ const parseURL = require('url').parse
 
 export interface AccountFactoryBuilder {
   (authorize: Authorize,
-  onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
+  onEmit: <T>(doc: Partial<AccountDoc>, ...args: any[]) => T,
   opts?: Partial<AccountFactorySpec>): AccountFactory
 }
 
@@ -161,7 +161,7 @@ const IS_VALID_ACCOUNT_OBJECT_ENTRY: { [P in keyof AccountObject]: Predicate } =
 
 const getAccountFactory: AccountFactoryBuilder =
 function (authorize: Authorize,
-onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
+onEmit: <T>(doc: Partial<AccountDoc>, ...args: any[]) => T,
 opts?: Partial<AccountFactorySpec>) {
   return function (obj?: any) {
     return _AccountBuilder.getInstance(authorize, onEmit, opts)
@@ -174,7 +174,7 @@ opts?: Partial<AccountFactorySpec>) {
 
 class _AccountBuilder {
   static getInstance (authorize: Authorize,
-  onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
+  onEmit: <T>(doc: Partial<AccountDoc>, ...args: any[]) => T,
   opts?: Partial<AccountFactorySpec>): _AccountBuilder {
     const withDocRef = opts && opts.include_docref
     const authHandler = isFunction(authorize) ? authorize : freepass
@@ -254,8 +254,8 @@ class _AccountBuilder {
         ? this // authorize may optionally reject with an Error, in which case this never executes
         : update.withDefaultNameAndId().toAccount())
       },
-      emit <T>() {
-        return onEmit<T>(account, this)
+      emit <T>(...args: any[]) {
+        return onEmit<T>(account, ...args)
       }
     }
   }
@@ -263,7 +263,7 @@ class _AccountBuilder {
   private constructor (
     readonly includeDocRef: boolean,
     readonly authorize: Authorize,
-    readonly onEmit: <T>(doc: Partial<AccountDoc>, account?: Account) => T,
+    readonly onEmit: <T>(doc: Partial<AccountDoc>, ...args: any[]) => T,
     readonly getDocId: (obj: Partial<AccountObject>) => string,
     readonly getName: (obj: Partial<AccountObject>) => string|void,
     readonly account: Partial<AccountDoc> = {}
